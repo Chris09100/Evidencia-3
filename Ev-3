@@ -1,0 +1,261 @@
+import datetime
+import random 
+import sys
+import sqlite3
+from sqlite3 import Error
+try:
+   with sqlite3.connect("Evid3Cow.db") as conn:
+       mi_cursor = conn.cursor()
+       mi_cursor.execute("CREATE TABLE IF NOT EXISTS registro de clientes (clave INTEGER PRYMARY KEY, nombre TEXT NOT NULL);")
+       mi_cursor.execute("CREATE TABLE IF NOT EXISTS registo de salas (clave INTEGER PRIMARY KEY, nombre de sala TEXT NOT NULL, cupo INTEGER);")
+       mi_cursor.execute("CREATE TABLE IF NOT EXISTS reservaciones (clave INTEGER PRIMARY KEY, sala INTEGER NOT NULL, FOREIGN KEY(sala) REFERENCES registro de salas(clave), descripción TEXT NOT NULL, fecha timestamp, cliente INTEGER NOT NULL, FOREIGN KEY(cliente) REFERENCES registro de clientes(clave);")
+except sqlite3.Error as e:
+  print(e)
+except:
+  print(f"Se produjo un error {sys.exc_info()[0]}")
+finally:
+  if (conn):
+    conn.close()
+
+while True:
+    print("***********")
+    print("*     MENU PRINCIPAL        *")
+    print("***********")
+
+    print("1) Reservaciones")
+    print("2) Reportes")
+    print("3) Registrar una sala")
+    print("4) Registrar un cliente")
+    print("5) Salir")
+    respuesta = input("¿Que opcion desea?: ")
+
+    try:
+     respuesta_int = int(respuesta)
+    except ValueError:
+        print("* NO ES VALIDA LA RESPUESTA *")
+    except Exception:
+        print("** SE HA PRESENTADO UNA EXCEPCION")
+   
+    if respuesta_int == 1:
+        print("***********")
+        print("*      RESERVACIONES        *")
+        print("***********")
+        print("1) Registrar nueva reservacion")
+        print("2) Modificar descripcion de una reservacion")
+        print("3) Consultar disponibilidad de salas para una fecha")
+        print("4) Eliminar una reservacion")
+        print("5) Salir")
+        res= input("¿Que opcion desea?: ")
+
+        try:
+           res_int = int(res)
+        except ValueError:
+           print("* NO ES VALIDA LA RESPUESTA *")
+        except Exception:
+            print("** SE HA PRESENTADO UNA EXCEPCION")
+        
+        if res_int == 1:
+            print("**********")
+            print("        RESERVACION         ")
+            print("**********")
+            import sqlite3
+            from sqlite3 import Error
+            import sys
+            try:
+              with sqlite3.connect("Evid3Cow.db", detect_types= sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                mi_cursor = conn.cursor()
+                mi_cursor.execute("SELECT * FROM clientes ORDER BY nombre")
+                registros = mi_cursor.fetchall()
+                print("   ")
+                if registros:
+                    print("Claves\tNombres")
+                    print("*" * 25)
+                    for clave_cliente, nombre_cliente in registros:
+                      print(f"{clave_cliente}\t{nombre_cliente}")
+          
+                    cliente_reserva = int(input("Clave del cliente que desea reservar: "))          
+                    if cliente_reserva in cliente:
+                        num_res = [random.randrange(1,1001) for valor in range(1000)]
+                        res_num = format(id(num_res), )
+                        mi_cursor.execute("SELECT * FROM salas ORDER BY nombre")
+                        registro_salas = mi_cursor.fetchall()
+                        print("  ")
+                        if registro_salas:
+                          print("Clave\tSala\tCupo")
+                          print("*" * 25)
+                          for clave_sala, nombre_sala, cupo_sala in  registro_salas:
+                            print(f"{clave_sala}\t{nombre_sala}\t{cupo_sala}")    
+                          res_sala = int(input("Clave de la sala ha reservar: "))
+                          if res_sala in registro_salas:
+                              desc = ("Descripcion del evento: ")
+                              fecha = input("Fecha ha reservar (dd/mm/aaaa): ")
+                              fecha_res = datetime.datetime.strptime(fecha, "%d/%m/%Y").date()
+                              reservacion = (res_num, res_sala, desc, fecha_res, cliente_reserva)
+                              mi_cursor.execute("INSERT INTO reservaciones VALUES(?,?,?,?,?)",reservacion)
+                          else:
+                            print("Esta sala no se encuentra")        
+                        else:
+                           print("Esta clave no se encuentra en registros")
+                    else:
+                      print("No se encontraron registros")
+            except Error as e:
+                 print(e) 
+            except:
+               print(f"Se produjo un error {sys.exc_info()[0]}")
+            finally:
+                conn.close()    
+        
+        if res_int == 2:
+            print("***************")
+            print("        MODIFICACION DE DESCRIPCION        ")
+            print("***************")
+        
+        if res_int == 3:
+            print("**************")
+            print("        DISPONIBILIDAD DE SALAS         ")
+            print("**************")
+            try:
+                with sqlite3.connect("Evid3Cow.db") as conn:
+                    mi_cursor = conn.cursor()
+                    mi_cursor.execute("SELECT * FROM salas ORDER BY nombre", sala)
+                    registro_salas = mi_cursor.fetchall()
+                    print("  ")
+                    if registro_salas:
+                       print("Clave\tSala\tCupo")
+                       print("*" * 25)
+                       for clave_sala, nombre_sala, cupo_sala in  registro_salas:
+                         print(f"{clave_sala}\t{nombre_sala}\t{cupo_sala}")
+                   
+            except Error as e:
+              print(e) 
+            except:
+               print(f"Se produjo un error {sys.exc_info()[0]}")
+            finally:
+              conn.close()  
+        
+        if res_int == 1:
+            print("***************")
+            print("        ELIMINAR UNA RESERVACION         ")
+            print("***************")
+
+        elif res_int == 5:
+         break
+        else:
+         print(f"Su opcion no es valida.") 
+
+    if respuesta_int == 2:
+        print("***********")
+        print("*        REPORTES           *")
+        print("***********")
+        print("1) Reporte en pantalla de reservaciones para una fecha")
+        print("2) Exportar reporte tabular en Excel")
+        print("3) Salir")
+        rep= input("Que opcion desea?: ")
+
+        try:
+           rep_int = int(rep)
+        except ValueError:
+           print("* NO ES VALIDA LA RESPUESTA *")
+        except Exception:
+            print("** SE HA PRESENTADO UNA EXCEPCION")  
+
+        if rep_int == 1:
+            print("*******^******")
+            print("        REPORTE EN PANTALLA         ")
+            print("************")
+            print("   ")
+            con_fecha = input("Fecha de reservas que desea consultar(dd/mm/aaaa): ")
+            fecha_con = datetime.datetime.strptime(con_fecha, "%d/%m/%Y").date()
+            try:
+                with sqlite3.connect("Evid3Cow.db", detect_types= sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES) as conn:
+                    mi_cursor = conn.cursor()
+                    consultas = {"fecha": fecha_con}
+                    mi_cursor.execute("SELECT clave, desc, fecha, cliente, sala FROM reservaciones WHERE DATE(fecha_res) = _fecha;", consultas)
+                    cons = mi_cursor.fetchall
+                    if registro_salas:
+                        print("Clave\tDesc.\tFecha\tCliente\tSala")
+                        print("*" * 25)
+                        for clave, desc, fecha, cliente, sala in cons:
+                            print(f"{res_num}\t{desc}\t{fecha_res}\t{cliente}\t{clave_sala}")
+            except Error as e:
+                 print(e) 
+            except:
+               print(f"Se produjo un error {sys.exc_info()[0]}")
+            finally:
+                conn.close() 
+
+          
+        if rep_int == 2:
+            print("***********")
+            print("        REPORTE EN EXCEL       ")
+            print("***********")
+        
+        elif res_int == 3:
+          break
+        else:
+          print(f"Su opcion no es valida.") 
+
+    if respuesta_int == 3:
+        print("************")
+        print("        REGISTRAR SALA          ")
+        print("************")
+        numero = [random.randrange(1,1001) for valor in range(1)]
+        clave_sala = format(id(numero),"x")
+        print(f"Clave de la sala: {clave_sala}")
+        nombre_sala = input("Nombre de la sala: ")
+        cupo_sala = input("Cupo de sala: ")
+
+        try:
+            cupo_sala_int = int(cupo_sala)
+        except ValueError:
+            print("* NO ES VALIDA LA RESPUESTA *")
+        except Exception:
+            print("** SE HA PRESENTADO UNA EXCEPCION")
+        
+        if cupo_sala_int > 0:
+           print("La Sala ha sido registrada")
+        else:
+            print("El cupo de la sala debe ser mayor a 0")  
+
+        try:
+         with sqlite3.connect("Evid3Cow.db") as conn:
+           mi_cursor = conn.cursor()
+           sala = (clave_sala, nombre_sala, cupo_sala_int)
+           mi_cursor.execute("INSERT INTO salas VALUES(?,?,?)", sala)
+           print("Sala registrada exitosamente")
+        except Error as e:
+            print(e) 
+        except:
+            print(f"Se produjo un error {sys.exc_info()[0]}")
+        finally:
+            conn.close()  
+        
+
+    if respuesta_int == 4:
+       print("**************")
+       print("       REGISTRO DE NUEVO CLIENTE        ")
+       print("**************")
+       import sys
+       import sqlite3
+       from sqlite3 import Error
+
+       num = [random.randrange(1,1001) for valor in range(1000)]
+       clave_cliente = format(id(num), )
+       print(f"Clave del cliente: {clave_cliente}")
+       nombre_cliente = input("Nombre del cliente: ")
+
+       try:
+          with sqlite3.connect("Evid3Cow.db") as conn:
+               mi_cursor = conn.cursor()
+               cliente = (clave_cliente, nombre_cliente)
+               mi_cursor.execute("INSERT INTO proyecto VALUES(?,?)", cliente)
+               print("Cliente registrado exitosamente")
+       except Error as e:
+           print(e) 
+       except:
+           print(f"Se produjo un error {sys.exc_info()[0]}")
+       finally:
+           conn.close()      
+
+    elif respuesta_int == 5:
+        break
